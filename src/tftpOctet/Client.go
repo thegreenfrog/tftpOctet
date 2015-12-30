@@ -11,10 +11,10 @@ const (
 	UDP_NET = "udp"
 )
 
+
 //-------------------------------------------------------------------------------------------------------
 //Client Type provides functionality for clients to write and read files to and from server
 //-------------------------------------------------------------------------------------------------------
-
 
 type Client struct {
 	RemoteAddr 	*net.UDPAddr//UDP Addr to communicate with server
@@ -35,6 +35,7 @@ func (c Client) WriteFile(filename string, mode string, handler func(w *io.PipeW
 	read, write := io.Pipe()
 	send := &sender{c.RemoteAddr, conn, read, filename, mode, c.Log}
 	var wait sync.WaitGroup
+	defer readWriteLock.Lock()
 	wait.Add(1)
 	go func() {
 		handler(write)
@@ -42,6 +43,7 @@ func (c Client) WriteFile(filename string, mode string, handler func(w *io.PipeW
 	}()
 	send.run(false)
 	wait.Wait()
+	defer readWriteLock.Unlock()
 	return nil
 }
 
@@ -59,6 +61,7 @@ func (c Client) ReadFile(filename string, mode string, handler func(r *io.PipeRe
 	read, write := io.Pipe()
 	receive := &receiver{c.RemoteAddr, conn, write, filename, mode, c.Log}
 	var wait sync.WaitGroup
+	defer readWriteLock.RLock()
 	wait.Add(1)
 	go func() {
 		handler(read)
@@ -66,6 +69,6 @@ func (c Client) ReadFile(filename string, mode string, handler func(r *io.PipeRe
 	}()
 	receive.run(false)
 	wait.Wait()
-	
+	defer readWriteLock.RUnlock()
 	return nil
 }
