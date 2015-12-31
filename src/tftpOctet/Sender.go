@@ -111,7 +111,7 @@ func (s *sender) sendWriteRequest(dataGram []byte) error {
 			switch p := packet.(type) {
 				case *ACK:
 					if p.BlockNum == 0 {
-						s.Log.Printf("received ACK 0")
+						s.Log.Printf("Sender received ACK 0")
 						s.RemoteAddr = remoteAddress
 						return nil
 					}
@@ -151,7 +151,7 @@ func (s *sender) sendPackets(b []byte, dataLength int, blockNum uint16, dataGram
 			}
 			switch p := packet.(type) {
 				case *ACK:
-					s.Log.Printf("received ACK %d", p.BlockNum)
+					s.Log.Printf("Sender received ACK %d", p.BlockNum)
 					if blockNum == p.BlockNum { //successful
 						return nil
 					}

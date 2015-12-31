@@ -11,6 +11,10 @@ const (
 	UDP_NET = "udp"
 )
 
+var (
+	readWriteLock sync.RWMutex//Mutex lock for all reads and writes. Reads can happen concurrently while a write blocks all
+)
+
 
 //-------------------------------------------------------------------------------------------------------
 //Client Type provides functionality for clients to write and read files to and from server
@@ -35,7 +39,7 @@ func (c Client) WriteFile(filename string, mode string, handler func(w *io.PipeW
 	read, write := io.Pipe()
 	send := &sender{c.RemoteAddr, conn, read, filename, mode, c.Log}
 	var wait sync.WaitGroup
-	defer readWriteLock.Lock()
+	readWriteLock.Lock()
 	wait.Add(1)
 	go func() {
 		handler(write)
@@ -61,7 +65,7 @@ func (c Client) ReadFile(filename string, mode string, handler func(r *io.PipeRe
 	read, write := io.Pipe()
 	receive := &receiver{c.RemoteAddr, conn, write, filename, mode, c.Log}
 	var wait sync.WaitGroup
-	defer readWriteLock.RLock()
+	readWriteLock.RLock()
 	wait.Add(1)
 	go func() {
 		handler(read)

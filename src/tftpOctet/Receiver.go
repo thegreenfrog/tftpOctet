@@ -91,7 +91,7 @@ func (r *receiver) receiveBlock(b []byte, blockNum uint16, firstBlockAndClient b
 			}
 			switch p := packet.(type) {
 				case *DATA:
-					r.Log.Printf("received Data #%d (%d bytes)", p.BlockNum, len(p.Data))
+					r.Log.Printf("Receiver received Data #%d (%d bytes)", p.BlockNum, len(p.Data))
 					if blockNum == p.BlockNum {
 						if firstBlockAndClient {
 							r.RemoteAddr = remoteAddr
@@ -103,6 +103,7 @@ func (r *receiver) receiveBlock(b []byte, blockNum uint16, firstBlockAndClient b
 							r.Log.Printf("ACK #%d sent", blockNum)
 							return len(p.Data) < BLOCK_SIZE, nil
 						} else {
+							r.Log.Printf("Error unpacking packet #%d", p.BlockNum)
 							errPacket := ERROR{ERROR_UNDEFINED, err.Error()}
 							r.UDPConn.WriteToUDP(errPacket.Pack(), r.RemoteAddr)
 							return false, fmt.Errorf("Failed to Save into Memory: %v", err)

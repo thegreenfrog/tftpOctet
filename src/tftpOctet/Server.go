@@ -66,7 +66,7 @@ func (s Server) handleRequest(conn *net.UDPConn) error {
 	}
 	switch p := packet.(type) {
 		case *RRQ://Read Request
-			s.Log.Printf("received read request (%s, %s)", p.FileName, p.Mode)
+			s.Log.Printf("Server received read request (%s, %s)", p.FileName, p.Mode)
 			transConn, err := s.transmissionConn()
 			if err != nil {
 				return fmt.Errorf("Attempt at transmission setup failed: %v", err)
@@ -77,7 +77,7 @@ func (s Server) handleRequest(conn *net.UDPConn) error {
 			go s.ReadHandler(p.FileName, write)
 			go send.run(true)
 		case *WRQ://Write Request
-			s.Log.Printf("received write request (%s, %s)", p.FileName, p.Mode)
+			s.Log.Printf("Server received write request (%s, %s)", p.FileName, p.Mode)
 			transConn, err := s.transmissionConn()
 			if err != nil {
 				return fmt.Errorf("Attempt at transmission setup failed: %v", err)
