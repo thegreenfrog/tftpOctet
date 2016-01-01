@@ -7,7 +7,7 @@ Starting up the server:
 addr, _ := net.ResolveUDPAddr(UDP_NET, "localhost:PORT")
 log := log.New(os.Stderr, "", log.Ldate|log.Ltime)
 
-s *Server;
+s *Server
 s = &Server{addr, handleRead, handleWrite, log}
 go s.Startup()
 ```
